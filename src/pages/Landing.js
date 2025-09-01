@@ -309,7 +309,7 @@ const Landing = () => {
               <h3 className="text-2xl font-bold text-charcoal mb-8 text-center">For Donors</h3>
               <div className="space-y-8">
                 {[
-                  { step: "1", title: "Upload Donation", desc: "Take photos and add details of your clothes" },
+                  { step: "1", title: "Upload Donation", desc: "Add details of your clothes" },
                   { step: "2", title: "AI Matching", desc: "Our AI finds the best NGO matches for your donation" },
                   { step: "3", title: "Admin Review", desc: "Quality check and verification process" },
                   { step: "4", title: "NGO Selection", desc: "NGOs request your items based on their needs" },

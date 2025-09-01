@@ -1,5 +1,8 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { mockUsers } from '../mock';
+import { mockNotifications } from '../mock'; // Import notifications data
+import { api } from '../lib/api';
+
 
 const AuthContext = createContext();
 
@@ -13,46 +16,68 @@ export const useAuth = () => {
 
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
+  const [notifications, setNotifications] = useState([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     // Check if user is logged in from localStorage
     const savedUser = localStorage.getItem('rewearify_user');
     if (savedUser) {
-      setUser(JSON.parse(savedUser));
+      const parsedUser = JSON.parse(savedUser);
+      setUser(parsedUser);
+      // Initialize notifications for the logged-in user
+      const userNotifications = mockNotifications
+        .filter(n => n.userId === parsedUser.id)
+        .map(n => ({ ...n })); // Create a new array to avoid mutating the original
+      setNotifications(userNotifications);
     }
     setLoading(false);
   }, []);
 
-  const login = async (email, password) => {
-    // Mock login logic
-    const foundUser = mockUsers.find(u => u.email === email);
-    if (foundUser) {
-      setUser(foundUser);
-      localStorage.setItem('rewearify_user', JSON.stringify(foundUser));
-      return { success: true, user: foundUser };
+const login = async (email, password) => {
+  try {
+    const { data } = await api.post('/api/auth/login', { email, password });
+    if (data.success) {
+      localStorage.setItem('rewearify_user', JSON.stringify(data.user));
+      localStorage.setItem('rewearify_token', data.token);
+      setUser(data.user);
+      // you can still hydrate notifications from mock for now
+      const userNotifications = mockNotifications
+        .filter(n => n.userId === data.user.id)
+        .map(n => ({ ...n }));
+      setNotifications(userNotifications);
+
+      return data; // { success:true, user, token }
     }
-    return { success: false, error: 'Invalid credentials' };
-  };
+    return data;
+  } catch (err) {
+    return { success: false, error: err.response?.data?.error || 'Server error' };
+  }
+};
 
-  const signup = async (userData) => {
-    // Mock signup logic
-    const newUser = {
-      id: `user_${Date.now()}`,
-      ...userData,
-      joinDate: new Date().toISOString().split('T')[0],
-      profilePicture: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face'
-    };
-    
-    setUser(newUser);
-    localStorage.setItem('rewearify_user', JSON.stringify(newUser));
-    return { success: true, user: newUser };
-  };
+const signup = async (userData) => {
+  try {
+    const { data } = await api.post('/api/auth/signup', userData);
+    if (data.success) {
+      localStorage.setItem('rewearify_user', JSON.stringify(data.user));
+      localStorage.setItem('rewearify_token', data.token);
+      setUser(data.user);
+      setNotifications([]);
+      return data;
+    }
+    return data;
+  } catch (err) {
+    return { success: false, error: err.response?.data?.error || 'Server error' };
+  }
+};
 
-  const logout = () => {
-    setUser(null);
-    localStorage.removeItem('rewearify_user');
-  };
+const logout = () => {
+  setUser(null);
+  setNotifications([]);
+  localStorage.removeItem('rewearify_user');
+  localStorage.removeItem('rewearify_token');
+};
+
 
   const updateProfile = (updatedData) => {
     const updatedUser = { ...user, ...updatedData };
@@ -60,12 +85,20 @@ export const AuthProvider = ({ children }) => {
     localStorage.setItem('rewearify_user', JSON.stringify(updatedUser));
   };
 
+  const updateNotificationRead = (id) => {
+    setNotifications(notifications.map(n =>
+      n.id === id ? { ...n, read: true } : n
+    ));
+  };
+
   const value = {
     user,
+    notifications,
     login,
     signup,
     logout,
     updateProfile,
+    updateNotificationRead,
     loading
   };
 

@@ -1,4 +1,5 @@
-import React from 'react';
+// src/components/DonorDashboard.js
+import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
 import { Button } from '../ui/button';
@@ -17,8 +18,16 @@ import {
   Eye,
   Users,
   Award,
-  Recycle
+  Recycle,
+  Bell
 } from 'lucide-react';
+import { 
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+  DropdownMenuSeparator,
+} from '../ui/dropdown-menu';
 import { mockDonations, mockRequests, mockNotifications } from '../../mock';
 
 const DonorDashboard = () => {
@@ -57,6 +66,9 @@ const DonorDashboard = () => {
       default: return <Clock className="h-4 w-4 text-gray-600" />;
     }
   };
+
+  // State for notifications panel
+  const [isNotificationsOpen, setIsNotificationsOpen] = useState(false);
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -315,23 +327,42 @@ const DonorDashboard = () => {
               </CardContent>
             </Card>
 
-            {/* Recent Notifications */}
+            {/* Notifications Panel */}
             <Card>
               <CardHeader>
-                <CardTitle>Recent Updates</CardTitle>
+                <CardTitle className="flex items-center space-x-2">
+                  <Bell className="h-5 w-5 text-blue-600" />
+                  <span>Notifications</span>
+                </CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="space-y-3">
-                  {userNotifications.slice(0, 3).map((notification) => (
-                    <div key={notification.id} className="flex items-start space-x-3 p-2 rounded-lg hover:bg-gray-50">
-                      <div className={`w-2 h-2 rounded-full mt-2 ${notification.read ? 'bg-gray-300' : 'bg-blue-500'}`}></div>
-                      <div className="flex-1">
-                        <p className="text-sm font-medium text-gray-900">{notification.title}</p>
-                        <p className="text-xs text-gray-600 mt-1">{notification.message}</p>
-                      </div>
-                    </div>
-                  ))}
-                </div>
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button variant="outline" className="w-full justify-start">
+                      <Bell className="h-4 w-4 mr-2" />
+                      View Notifications
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent className="w-80" align="start">
+                    {userNotifications.slice(0, 5).map((notification) => (
+                      <DropdownMenuItem key={notification.id} className="p-3">
+                        <div className="flex items-start space-x-2">
+                          <div className={`w-2 h-2 rounded-full mt-1 ${notification.read ? 'bg-gray-300' : 'bg-blue-500'}`}></div>
+                          <div>
+                            <p className="text-sm text-gray-900">{notification.title}</p>
+                            <p className="text-xs text-gray-600 mt-1">{notification.message}</p>
+                          </div>
+                        </div>
+                      </DropdownMenuItem>
+                    ))}
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem className="justify-center">
+                      <Link to="/notifications" className="text-sm text-green-600 hover:text-green-700">
+                        View all notifications
+                      </Link>
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
               </CardContent>
             </Card>
           </div>

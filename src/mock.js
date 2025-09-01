@@ -162,28 +162,39 @@ export const mockNotifications = [
     title: 'Donation Approved!',
     message: 'Your winter coats donation has been approved and is now available for requests.',
     timestamp: '2024-11-16T10:30:00Z',
-    read: false,
+    read: false, // Still unread for action
     actionUrl: '/dashboard/donations/don_001'
   },
   {
-    id: 'notif_002', 
+    id: 'notif_002',
     userId: '1',
     type: 'request_received',
     title: 'New Request Received',
     message: 'Hope Community Center has requested 3 items from your winter coats donation.',
-    timestamp: '2024-11-16T14:45:00Z', 
-    read: false,
+    timestamp: '2024-11-16T14:45:00Z',
+    read: true, // Marked as read after review
     actionUrl: '/dashboard/requests/req_001'
   },
   {
     id: 'notif_003',
     userId: '2',
-    type: 'request_approved', 
+    type: 'request_approved',
     title: 'Request Approved',
     message: 'Your request for winter coats has been approved! Delivery scheduled for Nov 22.',
     timestamp: '2024-11-17T09:15:00Z',
     read: true,
     actionUrl: '/dashboard/my-requests/req_001'
+  },
+  // New notification for today
+  {
+    id: 'notif_004',
+    userId: '1',
+    type: 'thank_you',
+    title: 'Thank You from Community!',
+    message: 'A local family thanked you for your recent winter coats donation at 06:57 PM IST today.',
+    timestamp: '2025-08-28T13:27:00Z', // 06:57 PM IST in UTC
+    read: false,
+    actionUrl: '/dashboard/donations/don_001'
   }
 ];
 

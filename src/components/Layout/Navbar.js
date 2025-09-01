@@ -172,7 +172,9 @@ const Navbar = () => {
                     <Button variant="ghost" className="flex items-center space-x-2 h-auto p-1">
                       <Avatar className="h-8 w-8">
                         <AvatarImage src={user.profilePicture} alt={user.name} />
-                        <AvatarFallback>{user.name?.charAt(0)}</AvatarFallback>
+                        <AvatarFallback>
+  {user?.name?.charAt(0) || "?"}
+</AvatarFallback>
                       </Avatar>
                       <div className="hidden sm:block text-left">
                         <p className="text-sm font-medium text-gray-900">{user.name}</p>
